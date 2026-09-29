@@ -1,6 +1,6 @@
 extern "C" {
-#include "../../src/data_structures/hashmap.h"
-#include "../../src/helpers/hash.h"
+#include "src/data_structures/hashmap.h"
+#include "src/helpers/hash.h"
 }
 #include <cstdio>
 #include <gtest/gtest.h>
@@ -25,31 +25,31 @@ static size_t always_bucket_zero(void* key, size_t num_buckets) {
 
 
 TEST(HashmapTest, CreatesHashmap) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     EXPECT_EQ(hashmap.size, 0u);
 }
 
 TEST(HashmapTest, EmptyHashmapStartsWithSizeZero) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
 
     EXPECT_EQ(hashmap.size, 0u);
     EXPECT_EQ(hashmap.capacity, 0u);
 }
 
 TEST(HashmapTest, GetOnEmptyHashmapReturnsNull) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
 
     EXPECT_EQ(hashmap_get(&hashmap, (char*) "missing"), nullptr);
 }
 
 TEST(HashmapTest, ContainsOnEmptyHashmapReturnsFalse) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
 
     EXPECT_FALSE(hashmap_contains(&hashmap, (char*) "missing"));
 }
 
 TEST(HashmapTest, CapacityDoublesOnGrowth) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int a = 1, b = 2, c = 3;
 
     hashmap_set(&hashmap, (char*) "a", &a);
@@ -63,7 +63,7 @@ TEST(HashmapTest, CapacityDoublesOnGrowth) {
 }
 
 TEST(HashmapTest, HappyPathSetAndGet) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int a = 10, b = 20, c = 30;
 
     hashmap_set(&hashmap, (char*) "a", &a);
@@ -76,7 +76,7 @@ TEST(HashmapTest, HappyPathSetAndGet) {
 }
 
 TEST(HashmapTest, ContainsReturnsTrueAfterSet) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int value = 42;
 
     hashmap_set(&hashmap, (char*) "key", &value);
@@ -85,7 +85,7 @@ TEST(HashmapTest, ContainsReturnsTrueAfterSet) {
 }
 
 TEST(HashmapTest, GetReturnsNullWhenKeyNotFound) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int value = 42;
 
     hashmap_set(&hashmap, (char*) "key", &value);
@@ -94,7 +94,7 @@ TEST(HashmapTest, GetReturnsNullWhenKeyNotFound) {
 }
 
 TEST(HashmapTest, SetOverwritesExistingKey) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int first = 1, second = 2;
 
     hashmap_set(&hashmap, (char*) "key", &first);
@@ -105,7 +105,7 @@ TEST(HashmapTest, SetOverwritesExistingKey) {
 }
 
 TEST(HashmapTest, SetOnCollidingBucketsResolvesCorrectly) {
-    Hashmap hashmap = hashmap_new(always_bucket_zero, 0.75f);
+    Hashmap hashmap = hashmap_new(always_bucket_zero, 0.75f, sizeof(int));
     int value_a = 1, value_b = 2;
 
     hashmap_set(&hashmap, (char*) "a", &value_a);
@@ -116,7 +116,7 @@ TEST(HashmapTest, SetOnCollidingBucketsResolvesCorrectly) {
 }
 
 TEST(HashmapTest, EntriesSurviveResize) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int a = 1, b = 2;
 
     hashmap_set(&hashmap, (char*) "a", &a);
@@ -130,7 +130,7 @@ TEST(HashmapTest, EntriesSurviveResize) {
 }
 
 TEST(HashmapTest, NumBucketsForCapacityRespectsLoadFactor) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     size_t num_buckets = hashmap_get_num_buckets_for_capacity(&hashmap, 100);
 
     EXPECT_TRUE(is_prime((int) num_buckets));
@@ -138,8 +138,8 @@ TEST(HashmapTest, NumBucketsForCapacityRespectsLoadFactor) {
 }
 
 TEST(HashmapTest, DifferentLoadFactorThresholdsProduceDifferentBucketCounts) {
-    Hashmap low_threshold_hashmap = hashmap_new(djb2_hash, 0.5f);
-    Hashmap high_threshold_hashmap = hashmap_new(djb2_hash, 0.9f);
+    Hashmap low_threshold_hashmap = hashmap_new(djb2_hash, 0.5f, sizeof(int));
+    Hashmap high_threshold_hashmap = hashmap_new(djb2_hash, 0.9f, sizeof(int));
 
     size_t num_buckets_low = hashmap_get_num_buckets_for_capacity(&low_threshold_hashmap, 100);
     size_t num_buckets_high = hashmap_get_num_buckets_for_capacity(&high_threshold_hashmap, 100);
@@ -148,7 +148,7 @@ TEST(HashmapTest, DifferentLoadFactorThresholdsProduceDifferentBucketCounts) {
 }
 
 TEST(HashmapTest, SetSameKeyManyTimesKeepsSizeConstant) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int values[5] = {1, 2, 3, 4, 5};
 
     for (int i = 0; i < 5; ++i)
@@ -159,7 +159,7 @@ TEST(HashmapTest, SetSameKeyManyTimesKeepsSizeConstant) {
 }
 
 TEST(HashmapTest, HandlesManyKeysAcrossMultipleResizes) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
 
     const int NUM_KEYS = 60;
     static char keys[NUM_KEYS][16];
@@ -178,7 +178,7 @@ TEST(HashmapTest, HandlesManyKeysAcrossMultipleResizes) {
 }
 
 TEST(HashmapTest, RemoveDeletesKeyAndDecreasesSize) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int value = 42;
 
     hashmap_set(&hashmap, (char*) "key", &value);
@@ -191,7 +191,7 @@ TEST(HashmapTest, RemoveDeletesKeyAndDecreasesSize) {
 }
 
 TEST(HashmapTest, RemoveOnMissingKeyIsNoOp) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int value = 42;
 
     hashmap_set(&hashmap, (char*) "key", &value);
@@ -203,7 +203,7 @@ TEST(HashmapTest, RemoveOnMissingKeyIsNoOp) {
 }
 
 TEST(HashmapTest, ContainsReturnsFalseAfterRemove) {
-    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f);
+    Hashmap hashmap = hashmap_new(djb2_hash, 0.75f, sizeof(int));
     int value = 42;
 
     hashmap_set(&hashmap, (char*) "key", &value);

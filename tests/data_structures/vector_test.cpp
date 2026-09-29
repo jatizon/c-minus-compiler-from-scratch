@@ -1,5 +1,5 @@
 extern "C" {
-#include "../../src/data_structures/vector.h"
+#include "src/data_structures/vector.h"
 }
 #include <gtest/gtest.h>
 
@@ -11,13 +11,14 @@ static bool int_equals(void* a, void* b) {
 
 TEST(VectorTest, CreatesVector) {
     Vector vector = vector_new(sizeof(int));
-    EXPECT_EQ(vector_get_size(&vector), 0u);
+    EXPECT_EQ(vector.size, 0u);
 }
 
-TEST(VectorTest, PopOnEmptyVectorDies) {
+TEST(VectorTest, PopOnEmptyVectorIsIdempotentNoOp) {
     Vector vector = vector_new(sizeof(int));
 
-    EXPECT_DEATH(vector_pop(&vector), ".*");
+    EXPECT_EQ(vector_pop(&vector), nullptr);
+    EXPECT_EQ(vector.size, 0u);
 }
 
 TEST(VectorTest, GetOnEmptyVectorDies) {
@@ -31,14 +32,14 @@ TEST(VectorTest, GetAtSizeIndexDies) {
     int value = 42;
     vector_push(&vector, &value);
 
-    EXPECT_DEATH(vector_get_element_ptr(&vector, vector_get_size(&vector)), ".*");
+    EXPECT_DEATH(vector_get_element_ptr(&vector, vector.size), ".*");
 }
 
 TEST(VectorTest, EmptyVectorStartsWithSizeZero) {
     Vector vector = vector_new(sizeof(int));
 
-    EXPECT_EQ(vector_get_size(&vector), 0u);
-    EXPECT_EQ(vector_get_capacity(&vector), 0u);
+    EXPECT_EQ(vector.size, 0u);
+    EXPECT_EQ(vector.capacity, 0u);
 }
 
 TEST(VectorTest, CapacityDoublesOnGrowth) {
@@ -46,13 +47,13 @@ TEST(VectorTest, CapacityDoublesOnGrowth) {
     int value = 0;
 
     vector_push(&vector, &value);
-    EXPECT_EQ(vector_get_capacity(&vector), 1u);
+    EXPECT_EQ(vector.capacity, 1u);
 
     vector_push(&vector, &value);
-    EXPECT_EQ(vector_get_capacity(&vector), 2u);
+    EXPECT_EQ(vector.capacity, 2u);
 
     vector_push(&vector, &value);
-    EXPECT_EQ(vector_get_capacity(&vector), 4u);
+    EXPECT_EQ(vector.capacity, 4u);
 }
 
 TEST(VectorTest, PopDecreasesSize) {
@@ -61,13 +62,13 @@ TEST(VectorTest, PopDecreasesSize) {
 
     vector_push(&vector, &a);
     vector_push(&vector, &b);
-    ASSERT_EQ(vector_get_size(&vector), 2u);
+    ASSERT_EQ(vector.size, 2u);
 
     vector_pop(&vector);
-    EXPECT_EQ(vector_get_size(&vector), 1u);
+    EXPECT_EQ(vector.size, 1u);
 
     vector_pop(&vector);
-    EXPECT_EQ(vector_get_size(&vector), 0u);
+    EXPECT_EQ(vector.size, 0u);
 }
 
 TEST(VectorTest, PopReturnsLastElement) {
@@ -89,7 +90,7 @@ TEST(VectorTest, HappyPathPushAndGet) {
     vector_push(&vector, &b);
     vector_push(&vector, &c);
 
-    ASSERT_EQ(vector_get_size(&vector), 3u);
+    ASSERT_EQ(vector.size, 3u);
 
     EXPECT_EQ(*(int*) vector_get_element_ptr(&vector, 0), 10);
     EXPECT_EQ(*(int*) vector_get_element_ptr(&vector, 1), 20);
@@ -148,7 +149,7 @@ TEST(VectorTest, RemoveShiftsSubsequentElementsAndDecreasesSize) {
 
     vector_remove(&vector, 0);
 
-    ASSERT_EQ(vector_get_size(&vector), 2u);
+    ASSERT_EQ(vector.size, 2u);
     EXPECT_EQ(*(int*) vector_get_element_ptr(&vector, 0), 20);
     EXPECT_EQ(*(int*) vector_get_element_ptr(&vector, 1), 30);
 }

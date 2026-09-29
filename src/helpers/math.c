@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
-#include "math.h"
+#include "src/helpers/math.h"
 
 
 int next_prime(int num) {

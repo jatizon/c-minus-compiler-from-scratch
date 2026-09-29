@@ -1,5 +1,5 @@
 extern "C" {
-#include "../../src/helpers/math.h"
+#include "src/helpers/math.h"
 }
 #include <gtest/gtest.h>
 

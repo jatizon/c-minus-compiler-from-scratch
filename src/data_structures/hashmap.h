@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "vector.h"
+#include "src/data_structures/vector.h"
 
 
 typedef struct Hashmap {
@@ -21,7 +21,8 @@ size_t hashmap_get_num_buckets_for_capacity(Hashmap* hashmap, size_t capacity);
 
 Hashmap hashmap_new(
     size_t (*hash_function)(void*, size_t),
-    float load_factor_threshold
+    float load_factor_threshold,
+    size_t element_size
 );
 
 void hashmap_initialize_bucket(Vector* buckets, size_t index);

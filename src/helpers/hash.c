@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include "hash.h"
+#include "src/helpers/hash.h"
 
 
 size_t djb2_hash(void* key, size_t num_buckets) {
