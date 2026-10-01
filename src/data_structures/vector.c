@@ -29,6 +29,14 @@ bool vector_empty(Vector* vector) {
     return vector->size == 0;
 }
 
+size_t vector_get_size(Vector* vector) {
+    return vector->size;
+}
+
+void* vector_get_data(Vector* vector) {
+    return vector->elements;
+}
+
 void vector_free(Vector* vector) {
     free(vector->elements);
 }

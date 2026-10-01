@@ -40,4 +40,8 @@ int vector_find(Vector* vector, void* element, bool (*compare_func)(void*, void*
 
 bool vector_empty(Vector* vector);
 
+size_t vector_get_size(Vector* vector);
+
+void* vector_get_data(Vector* vector);
+
 #endif

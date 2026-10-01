@@ -14,6 +14,13 @@ typedef struct Entry {
     void* value;
 } Entry;
 
+Entry entry_borrow(char* key, void* value) {
+    return (Entry) {
+        .key = key,
+        .value = value,
+    };
+}
+
 Entry entry_clone(char* key, void* value, size_t value_size) {
     void* value_copy;
     if (value_size != 0) {
@@ -108,12 +115,9 @@ void hashmap_set(Hashmap* hashmap, char* key, void* element) {
     size_t bucket_index = hashmap->hash_function(key, hashmap->num_buckets);
     Vector* bucket = &hashmap->buckets[bucket_index];
 
-    Entry* lookup_entry = &(Entry){
-        .key = key,
-        .value = NULL,
-    };
+    Entry lookup_entry = entry_borrow(key, NULL);
 
-    int found_index = vector_find(bucket, lookup_entry, entry_compare_keys);
+    int found_index = vector_find(bucket, &lookup_entry, entry_compare_keys);
     if (found_index != -1) {
         Entry* found = vector_get_element_ptr(bucket, found_index);
         Entry cloned = entry_clone(key, element, hashmap->element_size);
@@ -134,12 +138,9 @@ bool hashmap_contains(Hashmap* hashmap, char* key) {
     size_t bucket_index = hashmap->hash_function(key, hashmap->num_buckets);
     Vector* bucket = &hashmap->buckets[bucket_index];
 
-    Entry* entry = &(Entry){
-        .key = key,
-        .value = NULL,
-    };
+    Entry entry = entry_borrow(key, NULL);
 
-    int found_index = vector_find(bucket, entry, entry_compare_keys);
+    int found_index = vector_find(bucket, &entry, entry_compare_keys);
     return (found_index != -1);
 }
 
@@ -150,12 +151,9 @@ void* hashmap_get(Hashmap* hashmap, char* key) {
     size_t bucket_index = hashmap->hash_function(key, hashmap->num_buckets);
     Vector* bucket = &hashmap->buckets[bucket_index];
 
-    Entry* entry = &(Entry){
-        .key = key, 
-        .value = NULL,
-    };
+    Entry entry = entry_borrow(key, NULL);
 
-    int found_index = vector_find(bucket, entry, entry_compare_keys);
+    int found_index = vector_find(bucket, &entry, entry_compare_keys);
     if (found_index == -1)
         return NULL;
 
@@ -170,12 +168,9 @@ void hashmap_remove(Hashmap* hashmap, char* key) {
     size_t bucket_index = hashmap->hash_function(key, hashmap->num_buckets);
     Vector* bucket = &hashmap->buckets[bucket_index];
 
-    Entry* entry = &(Entry){
-        .key = key,
-        .value = NULL,
-    };
+    Entry entry = entry_borrow(key, NULL);
 
-    int found_index = vector_find(bucket, entry, entry_compare_keys);
+    int found_index = vector_find(bucket, &entry, entry_compare_keys);
     if (found_index == -1)
         return;
 

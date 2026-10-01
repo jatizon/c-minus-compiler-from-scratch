@@ -1,9 +1,5 @@
-#include "src/data_structures/vector.h"
+#include "src/data_structures/stack.h"
 
-
-typedef struct Stack {
-    Vector vector;
-} Stack;
 
 Stack stack_new(size_t element_size) {
     return (Stack) {
@@ -25,4 +21,8 @@ void* stack_top(Stack* stack) {
 
 bool stack_empty(Stack* stack) {
     return vector_empty(&stack->vector);
+}
+
+size_t stack_get_size(Stack* stack) {
+    return stack->vector.size;
 }

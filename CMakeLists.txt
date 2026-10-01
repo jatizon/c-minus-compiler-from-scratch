@@ -56,8 +56,46 @@ gtest_discover_tests(helpers_test)
 add_library(automata OBJECT src/automata/automata.c)
 target_link_libraries(automata PRIVATE project_includes)
 
+add_library(thompson OBJECT src/automata/thompson.c)
+target_link_libraries(thompson PRIVATE project_includes)
+
 add_library(stack OBJECT src/data_structures/stack.c)
 target_link_libraries(stack PRIVATE project_includes)
 
 add_library(queue OBJECT src/data_structures/queue.c)
 target_link_libraries(queue PRIVATE project_includes)
+
+add_library(regex_ast OBJECT src/regex/ast.c)
+target_link_libraries(regex_ast PRIVATE project_includes)
+
+add_library(string_helper OBJECT src/helpers/string.c)
+target_link_libraries(string_helper PRIVATE project_includes)
+
+add_executable(regex_test
+    src/regex/reverse_polish.c
+    src/regex/regex.c
+    src/regex/ast.c
+    src/data_structures/vector.c
+    src/data_structures/stack.c
+    src/helpers/string.c
+    tests/regex/reverse_polish_test.cpp
+    tests/regex/ast_test.cpp
+)
+target_link_libraries(regex_test PRIVATE GTest::gtest_main project_includes)
+
+gtest_discover_tests(regex_test)
+
+add_executable(automata_test
+    src/automata/automata.c
+    src/automata/thompson.c
+    src/regex/regex.c
+    src/data_structures/vector.c
+    src/data_structures/stack.c
+    src/helpers/string.c
+    tests/automata/automata_test.cpp
+    tests/automata/thompson_test.cpp
+    tests/automata/build_automaton_test.cpp
+)
+target_link_libraries(automata_test PRIVATE GTest::gtest_main project_includes)
+
+gtest_discover_tests(automata_test)
